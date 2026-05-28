@@ -1,0 +1,252 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Lato:wght@300;400&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  #tela {
+    min-height: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 5vw, 2rem);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .roses { font-size: clamp(1.4rem, 5vw, 2rem); margin-bottom: 1rem; }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 5.5vw, 2.2rem);
+    font-weight: 400;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+    line-height: 1.25;
+  }
+  h1 em { font-style: italic; color: #c0476b; }
+
+  .sub {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: clamp(0.85rem, 3vw, 1rem);
+    color: var(--color-text-secondary);
+    margin-bottom: 2.5rem;
+    letter-spacing: 0.05em;
+  }
+
+  .pergunta {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 4vw, 1.35rem);
+    color: var(--color-text-primary);
+    margin-bottom: 2rem;
+  }
+
+  .botoes-row {
+    display: flex;
+    gap: 1.2rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #btn-sim {
+    font-family: 'Lato', sans-serif;
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+    letter-spacing: 0.08em;
+    padding: 0.75rem 2.2rem;
+    background: #c0476b;
+    color: #fff;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+  #btn-sim:hover { background: #a33a59; transform: scale(1.04); }
+  #btn-sim:active { transform: scale(0.97); }
+
+  #btn-nao {
+    font-family: 'Lato', sans-serif;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
+    font-weight: 300;
+    color: var(--color-text-tertiary);
+    background: none;
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: 40px;
+    padding: 0.65rem 1.5rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: top 0.2s ease, left 0.2s ease;
+  }
+
+  #btn-nao.fixo {
+    position: static;
+  }
+
+  #btn-nao.fugindo {
+    position: fixed;
+    z-index: 100;
+  }
+
+  #roteiro {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 5vw, 2rem);
+    text-align: center;
+    width: 100%;
+  }
+
+  .check-circle {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #c0476b;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.2rem;
+  }
+  .check-circle svg { width: 28px; height: 28px; }
+
+  .rot-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
+    font-weight: 400;
+    color: var(--color-text-primary);
+    margin-bottom: 0.4rem;
+  }
+  .rot-sub {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    color: var(--color-text-secondary);
+    font-size: clamp(0.85rem, 3vw, 0.95rem);
+    margin-bottom: 2.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  .timeline { display: flex; flex-direction: column; width: 100%; max-width: 420px; }
+  .evento { display: flex; align-items: flex-start; gap: 1rem; text-align: left; padding-bottom: 2rem; }
+  .evento:last-child { padding-bottom: 0; }
+  .icone-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+  .icone { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+  .icone-missa { background: #f5e6ec; }
+  .icone-jantar { background: #fdf3e7; }
+  .linha-v { width: 1px; flex: 1; background: var(--color-border-tertiary); margin-top: 6px; min-height: 32px; }
+  .ev-info { padding-top: 6px; }
+  .ev-hora { font-family: 'Lato', sans-serif; font-size: 0.78rem; color: #c0476b; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; }
+  .ev-nome { font-family: 'Playfair Display', serif; font-size: clamp(1rem, 4vw, 1.15rem); color: var(--color-text-primary); margin-bottom: 2px; }
+  .ev-desc { font-family: 'Lato', sans-serif; font-weight: 300; font-size: clamp(0.82rem, 3vw, 0.88rem); color: var(--color-text-secondary); }
+
+  #confete-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; overflow: hidden; }
+  .confete-p { position: absolute; top: -20px; animation: cair linear forwards; }
+  @keyframes cair {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+</style>
+
+<div id="confete-wrap"></div>
+
+<div id="tela">
+  <div class="roses">🌹🌹🌹</div>
+  <h1>Jéssica, você toparia um<br><em>encontro especial</em> comigo?</h1>
+  <p class="sub">tenho algo muito especial planejado para nós dois</p>
+  <p class="pergunta">O que você acha?</p>
+  <div class="botoes-row">
+    <button id="btn-sim" onclick="aceitar()">Sim, adoraria!</button>
+    <button id="btn-nao" class="fixo">Não</button>
+  </div>
+</div>
+
+<div id="roteiro">
+  <div class="check-circle">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+  <h2 class="rot-titulo">Que bom!</h2>
+  <p class="rot-sub">Aqui está o nosso roteiro para a noite</p>
+  <div class="timeline">
+    <div class="evento">
+      <div class="icone-wrap">
+        <div class="icone icone-missa">⛪</div>
+        <div class="linha-v"></div>
+      </div>
+      <div class="ev-info">
+        <p class="ev-hora">19:00</p>
+        <p class="ev-nome">Missa</p>
+        <p class="ev-desc">Catedral Santo Antônio</p>
+      </div>
+    </div>
+    <div class="evento">
+      <div class="icone-wrap">
+        <div class="icone icone-jantar">🍝</div>
+      </div>
+      <div class="ev-info">
+        <p class="ev-hora">Após a missa</p>
+        <p class="ev-nome">Jantar italiano</p>
+        <p class="ev-desc">Uma noite deliciosa com culinária italiana, vinho e boa conversa</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const nao = document.getElementById('btn-nao');
+  let fugindo = false;
+  let intervalo = null;
+
+  function ativarFuga() {
+    if (fugindo) return;
+    fugindo = true;
+
+    const rect = nao.getBoundingClientRect();
+    nao.style.left = rect.left + 'px';
+    nao.style.top = rect.top + 'px';
+    nao.classList.remove('fixo');
+    nao.classList.add('fugindo');
+
+    moverNao();
+    intervalo = setInterval(moverNao, 1200);
+  }
+
+  function moverNao() {
+    const bw = nao.offsetWidth;
+    const bh = nao.offsetHeight;
+    const maxX = window.innerWidth - bw - 8;
+    const maxY = window.innerHeight - bh - 8;
+    nao.style.left = (8 + Math.random() * maxX) + 'px';
+    nao.style.top = (8 + Math.random() * maxY) + 'px';
+  }
+
+  nao.addEventListener('mouseover', ativarFuga);
+  nao.addEventListener('touchstart', ativarFuga, { passive: true });
+  nao.addEventListener('click', () => { ativarFuga(); moverNao(); });
+
+  function aceitar() {
+    if (intervalo) clearInterval(intervalo);
+    nao.style.display = 'none';
+    document.getElementById('tela').style.display = 'none';
+    document.getElementById('roteiro').style.display = 'flex';
+    lancarConfetes();
+  }
+
+  function lancarConfetes() {
+    const wrap = document.getElementById('confete-wrap');
+    const cores = ['#c0476b','#e8a0b4','#f9d6e2','#d4af37','#f5e6b0','#a8d8a8','#7ec8e3','#ffffff'];
+    for (let i = 0; i < 140; i++) {
+      const p = document.createElement('div');
+      p.className = 'confete-p';
+      p.style.left = (Math.random() * 100) + '%';
+      p.style.top = (-20 - Math.random() * 150) + 'px';
+      p.style.background = cores[Math.floor(Math.random() * cores.length)];
+      p.style.width = (6 + Math.random() * 8) + 'px';
+      p.style.height = (3 + Math.random() * 5) + 'px';
+      p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      p.style.animationDuration = (1.8 + Math.random() * 2) + 's';
+      p.style.animationDelay = (Math.random() * 0.8) + 's';
+      wrap.appendChild(p);
+      setTimeout(() => p.remove(), 4000);
+    }
+  }
+</script>
